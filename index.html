@@ -1,23 +1,108 @@
-<h1>Error</h1><p>Could not generate the application code. Gemini API error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits.
-* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 2
-Please retry in 22.370287371s. [violations {
-  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
-  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
-  quota_dimensions {
-    key: "model"
-    value: "gemini-2.5-pro"
-  }
-  quota_dimensions {
-    key: "location"
-    value: "global"
-  }
-  quota_value: 2
-}
-, links {
-  description: "Learn more about Gemini API quotas"
-  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
-}
-, retry_delay {
-  seconds: 22
-}
-]</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Sales Report</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="mb-4">Product Sales Dashboard</h1>
+
+        <div class="card bg-light mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Sales</h5>
+                <p class="card-text fs-2 fw-bold" id="total-sales">$0.00</p>
+            </div>
+        </div>
+
+        <h2>Sales by Product</h2>
+        <table id="product-sales" class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Total Sales</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // CSV data provided in the brief
+            const csvData = `product,region,sales
+Widget A,North,150.50
+Widget B,South,220.00
+Widget A,North,75.25`;
+
+            // --- Data Processing ---
+
+            const lines = csvData.trim().split('\n');
+            const records = lines.slice(1); // Remove header row
+
+            const productSales = {};
+            let grandTotalSales = 0;
+
+            records.forEach(record => {
+                const [product, region, salesStr] = record.split(',');
+                const sales = parseFloat(salesStr);
+
+                if (product && !isNaN(sales)) {
+                    // Aggregate sales for each product
+                    productSales[product] = (productSales[product] || 0) + sales;
+
+                    // Calculate the grand total
+                    grandTotalSales += sales;
+                }
+            });
+
+            // --- DOM Manipulation ---
+
+            const tableBody = document.querySelector('#product-sales tbody');
+            const totalSalesElement = document.getElementById('total-sales');
+
+            // Clear any placeholder content
+            tableBody.innerHTML = '';
+
+            // Currency formatter for consistent display
+            const currencyFormatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+
+            // Populate the table with aggregated product sales
+            for (const [product, total] of Object.entries(productSales)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product}</td>
+                    <td>${currencyFormatter.format(total)}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+
+            // Update the total sales display
+            totalSalesElement.textContent = currencyFormatter.format(grandTotalSales);
+        });
+    </script>
+
+</body>
+</html>
